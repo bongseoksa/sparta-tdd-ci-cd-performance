@@ -33,22 +33,58 @@
  * 유저는 검색어를 입력후 '검색'버튼을 클릭하여 리스트를 조회할 수 있다.
  */
 
-import { describe, it, expect } from 'vitest';
-import { render } from '@testing-library/react';
+import { describe, it, expect, vi, Mock } from 'vitest';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import SearchForm from '../searchForm';
+import { getSearch } from '../../api/searchApi';
+import SearchList from '../searchList';
+
+vi.mock('../../api/searchApi', async (importOriginal) => {
+  const mod = await importOriginal();
+  return { ...mod, getSearch: vi.fn() };
+});
 
 describe('SearchForm Rendering', () => {
+  // Given
+  const { getByTestId } = render(<SearchForm onSearch={() => {}} />);
+
+  // When
+  const inputField = getByTestId('search-input');
+  const searchButton = getByTestId('search-button');
+
   it('입력 필드와 버튼이 렌더링 되었다.', () => {
-    // Given
-    const { getByTestId } = render(<SearchForm />);
-
-    // When
-    const inputField = getByTestId('search-input');
-    const searchButton = getByTestId('search-button');
-
     // Then
     expect(inputField).toBeInTheDocument();
     expect(searchButton).toBeInTheDocument();
+  });
+
+  it('입력 문구가 존재하면 버튼이 활성화 상태이다.', () => {
+    // 입력 문구
+    const searchQuery = 'test';
+    fireEvent.change(inputField, { target: { value: searchQuery } });
+
+    expect(searchButton).toHaveAttribute('disabled', '');
+  });
+
+  it('입력 문구가 비어있으면 버튼이 비활성화 상태이다.', () => {
+    const searchQuery = '';
+    fireEvent.change(inputField, { target: { value: searchQuery } });
+
+    expect(searchButton).toBeDisabled();
+  });
+
+  it('검색 결과가 리스트로 나온다.', async () => {
+    const mockSearchQuery = 'test';
+    const mockData = { items: ['item-1', 'item-2', 'item-3'] };
+    const _getSearch = getSearch as Mock;
+    _getSearch.mockResolvedValue(mockData);
+
+    const data = await _getSearch(mockSearchQuery);
+    render(<SearchList items={data.items} />);
+
+    await waitFor(() => expect(screen.getByText('item-1')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('item-2')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('item-3')).toBeInTheDocument());
   });
 });

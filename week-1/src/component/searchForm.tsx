@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { MouseEventHandler, useState } from 'react';
 import styled from '@emotion/styled';
 import { Button, TextField } from '@mui/material';
 
@@ -7,17 +7,23 @@ const SearchFormStyle = styled.div`
   gap: 4px;
 `;
 
-export default function SearchForm() {
+export default function SearchForm({
+  onSearch,
+}: {
+  onSearch: (query: string) => void;
+}) {
   const [searchText, setSearchText] = useState<string>('');
 
   return (
     <SearchFormStyle>
       <TextField
         id="search-input"
-        data-testid="search-input"
         label="input"
         variant="standard"
         value={searchText}
+        inputProps={{
+          'data-testid': 'search-input',
+        }}
         onChange={(e) => {
           setSearchText(e.target.value);
         }}
@@ -27,6 +33,7 @@ export default function SearchForm() {
         data-testid="search-button"
         variant="contained"
         disabled={!searchText.trim()}
+        onClick={() => onSearch(searchText)}
       >
         Search
       </Button>
