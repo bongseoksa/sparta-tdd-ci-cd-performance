@@ -39,6 +39,17 @@ import '@testing-library/jest-dom';
 import SearchForm from '../searchForm';
 import { getSearch } from '../../api/searchApi';
 import SearchList from '../searchList';
+import App from '../../App';
+
+const getSearchMock = async () => {
+  const mockSearchQuery = 'test';
+  const mockData = { items: ['item-1', 'item-2', 'item-3'] };
+  const _getSearch = getSearch as Mock;
+  _getSearch.mockResolvedValue(mockData);
+
+  const data = await _getSearch(mockSearchQuery);
+  render(<SearchList items={data.items} />);
+};
 
 vi.mock('../../api/searchApi', async (importOriginal) => {
   const mod = await importOriginal();
@@ -75,16 +86,17 @@ describe('SearchForm Rendering', () => {
   });
 
   it('검색 결과가 리스트로 나온다.', async () => {
-    const mockSearchQuery = 'test';
-    const mockData = { items: ['item-1', 'item-2', 'item-3'] };
-    const _getSearch = getSearch as Mock;
-    _getSearch.mockResolvedValue(mockData);
-
-    const data = await _getSearch(mockSearchQuery);
-    render(<SearchList items={data.items} />);
+    await getSearchMock();
 
     await waitFor(() => expect(screen.getByText('item-1')).toBeInTheDocument());
     await waitFor(() => expect(screen.getByText('item-2')).toBeInTheDocument());
     await waitFor(() => expect(screen.getByText('item-3')).toBeInTheDocument());
+  });
+
+  it('snapshot', async () => {
+    await getSearchMock();
+
+    const app = render(<App />);
+    expect(app).toMatchSnapshot();
   });
 });
