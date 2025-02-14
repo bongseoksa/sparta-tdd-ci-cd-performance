@@ -1,5 +1,7 @@
+import InputComp from './components/inputComp';
+
 function App() {
-  return <>App</>;
+  return <InputComp />;
 }
 
 export default App;
