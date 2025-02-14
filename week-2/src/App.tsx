@@ -1,7 +1,7 @@
-import InputComp from './components/inputComp';
+import FindMostFrequentChar from './components/findMostFrequentChar';
 
 function App() {
-  return <InputComp />;
+  return <FindMostFrequentChar />;
 }
 
 export default App;
