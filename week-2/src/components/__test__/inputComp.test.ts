@@ -13,7 +13,15 @@ describe('findMostFrequentChar - 가장 많이 사용된 문자를 찾아서 반
     expect(result).toBe('');
   });
 
-  it('가장 많이 사용된 문자가 하나이면 해당 문자를 반환한다.', () => {});
+  it('가장 많이 사용된 문자가 하나이면 해당 문자를 반환한다.', () => {
+    const inputVal = 'abca';
+    const result = findMostFrequentChar(inputVal);
+    expect(result).toBe('a');
+  });
 
-  it('가장 많이 사용된 문자가 여러개이면 하나만 반환한다.', () => {});
+  it('가장 많이 사용된 문자가 여러개이면 하나만 반환한다.', () => {
+    const inputVal = 'aabb';
+    const result = findMostFrequentChar(inputVal);
+    expect(result === 'a' || result === 'b').toBeTruthy();
+  });
 });
